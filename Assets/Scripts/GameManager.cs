@@ -1,17 +1,19 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class GameManager : MonoBehaviour
 {
     public UnityEvent<int> OnTotalMuffinsChanged;
+    public UnityEvent<int> MuffinsPerSecondChanged;
 
     [Range(0f, 1f)] [SerializeField] private float _critChance = 0.01f;
 
     private int _muffinsPerClick = 1;
+    private int _muffinsPerSecond;
     private int _totalMuffins = 0;
+    private  float _muffinsPerSecondTimer;
 
-    private int TotalMuffins
+    public int TotalMuffins
     {
         get
         {
@@ -22,6 +24,21 @@ public class GameManager : MonoBehaviour
             _totalMuffins = value;
 
             OnTotalMuffinsChanged.Invoke(_totalMuffins);
+            
+        }
+    }
+
+    public int MuffinsPerSecond
+    {
+        get
+        {
+            return _muffinsPerSecond;
+        }
+        set
+        {
+            _muffinsPerSecond = value;
+            MuffinsPerSecondChanged.Invoke(_muffinsPerSecond);
+
         }
     }
 
@@ -31,10 +48,12 @@ public class GameManager : MonoBehaviour
 
         if (Random.value <= _critChance)
         {
+            //Crit
             addedMuffins = _muffinsPerClick * 10;
         }
         else
         {
+            //Normal
             addedMuffins = _muffinsPerClick;
         }
        
@@ -43,52 +62,46 @@ public class GameManager : MonoBehaviour
         return addedMuffins;
     }
  
-    public bool TryPurchaseUpgrade(int currentCost, int level)
+    public bool TryPurchaseUpgrade(int currentCost, int level, UpgradeType upgradeType)
     {
         if (TotalMuffins >= currentCost)
         {
+            //Purchase
             TotalMuffins -= currentCost;
             level++;
-            _muffinsPerClick = 1 + level * 2;
-           return true;
-        }
-        return false;
-    }
 
-    public bool TryPurchaseSugarRushUpgrade(int currentCost)
-    {
-        if (TotalMuffins >= currentCost)
-        {
-            TotalMuffins -= currentCost;
+            switch (upgradeType)
+            {
+                case UpgradeType.MuffinUpgrade:
+                    _muffinsPerClick = 1 + level * 2;
+                    break;
+                case UpgradeType.SugarRush:
+                    MuffinsPerSecond = level;
+                    break;
+                case UpgradeType.FancyMuffinUpgrade:
+                    //Fancy Muffin Upgrade
+                    break;
 
+            }
             return true;
         }
         return false;
     }
-
 
     private void Start()
     {
         TotalMuffins = 0;
     }
 
-    //private void Update()
-    //{
+    private void Update()
+    {
+        _muffinsPerSecondTimer += Time.deltaTime;
+        
+        if (_muffinsPerSecondTimer >= 1)
+        {
+            _muffinsPerSecondTimer--;
+            TotalMuffins += _muffinsPerSecond;
 
-    //    if (_muffinsPerSecond > 0)
-    //    {
-    //        _timer += Time.deltaTime;
-
-    //        if (_timer >= 1f)
-    //        {
-    //            TotalMuffins += Mathf.RoundToInt(_muffinsPerSecond);
-    //            _timer = 0;
-    //        }
-    //    }
-    //}
-    //public float GetMuffinsPerSecond()
-    //{
-    //    return _muffinsPerSecond;
-    //}
-
+        }
+    }
 }

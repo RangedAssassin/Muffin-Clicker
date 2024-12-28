@@ -7,8 +7,8 @@ using UnityEngine;
 
 public class Header : MonoBehaviour
 {
-    [SerializeField]
-    private TextMeshProUGUI _totalMuffinsText;
+    [SerializeField] private TextMeshProUGUI _totalMuffinsText;
+    [SerializeField] private TextMeshProUGUI _muffinsPerSecondText;
 
 
     /// <summary>
@@ -32,6 +32,24 @@ public class Header : MonoBehaviour
         //}
 
         _totalMuffinsText.text = counter == 1 ? "1 muffin" : $"{counter} muffins";
+    }
+
+    public void UpdateMuffinsPerSecond(int muffinsPerSecond)
+    {
+        if (muffinsPerSecond == 0)
+        {
+            _muffinsPerSecondText.text = muffinsPerSecond.ToString() + " Muffins / Second";
+        }
+        else if (muffinsPerSecond == 1)
+        {
+            _muffinsPerSecondText.text = muffinsPerSecond.ToString() + " Muffin / Second";
+        }
+        else
+        {
+            _muffinsPerSecondText.text = muffinsPerSecond.ToString() + " Muffins / Second";
+        }
+
+
     }
 
 }
